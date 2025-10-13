@@ -1,0 +1,11 @@
+*.log
+logs/
+.env
+.env.*
+/target/
+Cargo.lock
+*.jar
+.gradle/
+build/
+.vscode/
+.dockerignore
