@@ -1,0 +1,66 @@
+site_name: Keycloak Operations Documentation
+site_description: Comprehensive guide for Keycloak CC deployment and operations
+site_author: ADORSYS-GIS Team
+repo_url: https://github.com/ADORSYS-GIS/keycloak-ops
+repo_name: ADORSYS-GIS/keycloak-ops
+
+theme:
+  name: mkdocs
+  palette:
+    # Light mode
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - admonition
+  - pymdownx.details
+  - pymdownx.tabbed:
+      alternate_style: true
+  - attr_list
+  - md_in_html
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Overview: getting-started/overview.md
+    - Prerequisites: getting-started/prerequisites.md
+    - Quick Start: getting-started/quick-start.md
+  - Installation:
+    - Installation Guide: installation/guide.md
+    - Configuration: installation/configuration.md
+  - Operations:
+    - Deployment: operations/deployment.md
+    - Monitoring: operations/monitoring.md
+    - Troubleshooting: operations/troubleshooting.md
+  - Reference:
+    - API Reference: reference/api.md
+    - Configuration Options: reference/config.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/ADORSYS-GIS

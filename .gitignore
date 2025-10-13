@@ -1,0 +1,26 @@
+# Python Virtual Environment
+venv/
+.venv/
+env/
+ENV/
+
+# MkDocs
+site/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
