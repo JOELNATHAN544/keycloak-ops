@@ -9,12 +9,17 @@ Cargo.lock
 build/
 .vscode/
 .dockerignore
+.env.example
 
 # Python Virtual Environment
 venv/
 .venv/
 env/
 ENV/
+Vagrantfile
+.vagrant/
+kubeconfig
+cluster-disk.vdi
 
 # MkDocs
 site/
