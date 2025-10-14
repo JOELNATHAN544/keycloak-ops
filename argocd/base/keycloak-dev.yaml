@@ -7,37 +7,37 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: keycloak
-  
+
   source:
     # This will be overridden by Kustomize overlay with user's fork URL
     repoURL: ${REPO_URL}
     targetRevision: ${DEV_TARGET_REVISION}
     path: helm-chart
-    
+
     helm:
       # Use development values file
       valueFiles:
         - values-dev.yaml
-      
+
       # Additional values overrides for development
       values: |
         replicaCount: 1
-        
+
         image:
           pullPolicy: Always
-        
+
         ingress:
           enabled: true
           hostname: keycloak-dev.yourdomain.com
           tls:
             enabled: false
-        
+
         postgresql:
           enabled: true
           auth:
             username: keycloak
             database: keycloak_dev
-        
+
         resources:
           limits:
             cpu: 500m
@@ -45,34 +45,34 @@ spec:
           requests:
             cpu: 250m
             memory: 256Mi
-        
+
         autoscaling:
           enabled: false
-      
+
       releaseName: keycloak-dev
-  
+
   destination:
     server: https://kubernetes.default.svc
     namespace: keycloak-dev
-  
+
   syncPolicy:
     automated:
-      prune: true        # Delete resources removed from Git
-      selfHeal: true     # Auto-sync when cluster state differs
-      allowEmpty: false  # Don't sync if source is empty
-    
+      prune: true # Delete resources removed from Git
+      selfHeal: true # Auto-sync when cluster state differs
+      allowEmpty: false # Don't sync if source is empty
+
     syncOptions:
-      - CreateNamespace=true              # Auto-create namespace
+      - CreateNamespace=true # Auto-create namespace
       - PrunePropagationPolicy=foreground # Delete dependencies first
-      - PruneLast=true                    # Prune at the end
-    
+      - PruneLast=true # Prune at the end
+
     retry:
       limit: 5
       backoff:
         duration: 5s
         factor: 2
         maxDuration: 3m
-  
+
   # Ignore differences in replica count (in case HPA modifies it)
   ignoreDifferences:
     - group: apps

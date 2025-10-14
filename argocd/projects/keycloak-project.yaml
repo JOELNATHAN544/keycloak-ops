@@ -8,40 +8,40 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
 spec:
   description: Keycloak Identity and Access Management Project
-  
+
   # Source repositories from which applications can be deployed
   sourceRepos:
     # Allow any repository (can be restricted later for security)
-    - '*'
-  
+    - "*"
+
   # Destination clusters and namespaces where apps can be deployed
   destinations:
     # Allow deployment to any keycloak namespace
-    - namespace: 'keycloak-*'
+    - namespace: "keycloak-*"
       server: https://kubernetes.default.svc
-    
+
     # Allow deployment to argocd namespace (for app definitions)
     - namespace: argocd
       server: https://kubernetes.default.svc
-    
+
     # Allow deployment to default namespace if needed
     - namespace: default
       server: https://kubernetes.default.svc
-  
+
   # Cluster-scoped resources that can be created
   clusterResourceWhitelist:
-    - group: ''
+    - group: ""
       kind: Namespace
-    - group: 'rbac.authorization.k8s.io'
+    - group: "rbac.authorization.k8s.io"
       kind: ClusterRole
-    - group: 'rbac.authorization.k8s.io'
+    - group: "rbac.authorization.k8s.io"
       kind: ClusterRoleBinding
-  
+
   # Namespace-scoped resources (allow all)
   namespaceResourceWhitelist:
-    - group: '*'
-      kind: '*'
-  
+    - group: "*"
+      kind: "*"
+
   # Roles for the project (optional)
   roles:
     # Admin role - full access
@@ -51,7 +51,7 @@ spec:
         - p, proj:keycloak:admin, applications, *, keycloak/*, allow
       groups:
         - keycloak-admins
-    
+
     # Developer role - read and sync
     - name: developer
       description: Developer access for keycloak project
@@ -60,7 +60,7 @@ spec:
         - p, proj:keycloak:developer, applications, sync, keycloak/*, allow
       groups:
         - keycloak-developers
-    
+
     # Read-only role
     - name: readonly
       description: Read-only access for keycloak project
