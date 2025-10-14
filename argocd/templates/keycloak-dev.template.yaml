@@ -1,0 +1,77 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: keycloak-dev
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: keycloak
+  
+  source:
+    repoURL: ${REPO_URL}
+    targetRevision: ${DEV_TARGET_REVISION}
+    path: helm-chart
+    
+    helm:
+      valueFiles:
+        - values-dev.yaml
+      
+      values: |
+        replicaCount: 1
+        
+        image:
+          pullPolicy: Always
+        
+        ingress:
+          enabled: true
+          hostname: ${DEV_DOMAIN}
+          tls:
+            enabled: false
+        
+        postgresql:
+          enabled: true
+          auth:
+            username: keycloak
+            database: keycloak_dev
+        
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 250m
+            memory: 256Mi
+        
+        autoscaling:
+          enabled: false
+      
+      releaseName: keycloak-dev
+  
+  destination:
+    server: ${K8S_SERVER}
+    namespace: ${DEV_NAMESPACE}
+  
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+    
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+  
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas
