@@ -1,0 +1,41 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: keycloak-dev
+spec:
+  source:
+    helm:
+      values: |
+        # Development-specific overrides
+        replicaCount: 1
+        
+        image:
+          pullPolicy: Always
+        
+        ingress:
+          enabled: true
+          hostname: keycloak-dev.local
+          tls:
+            enabled: false
+        
+        postgresql:
+          enabled: true
+          auth:
+            username: keycloak
+            database: keycloak_dev
+            password: dev-password
+        
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 250m
+            memory: 256Mi
+        
+        # Enable debug logging for development
+        extraEnv:
+          - name: KEYCLOAK_LOGLEVEL
+            value: DEBUG
+          - name: KC_LOG_LEVEL
+            value: DEBUG
