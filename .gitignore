@@ -13,33 +13,3 @@ build/
 argocd-password.txt
 cluster-setup.sh
 CLUSTER_SETUP.md
-
-# Python Virtual Environment
-venv/
-.venv/
-env/
-ENV/
-Vagrantfile
-.vagrant/
-kubeconfig
-cluster-disk.vdi
-
-# MkDocs
-site/
-
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-
-# IDEs
-.idea/
-*.swp
-*.swo
-*~
-
-# OS
-.DS_Store
-Thumbs.db
