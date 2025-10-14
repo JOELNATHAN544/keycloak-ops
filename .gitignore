@@ -11,6 +11,8 @@ build/
 .dockerignore
 .env.example
 argocd-password.txt
+cluster-setup.sh
+CLUSTER_SETUP.md
 
 # Python Virtual Environment
 venv/
@@ -33,7 +35,6 @@ __pycache__/
 .Python
 
 # IDEs
-.vscode/
 .idea/
 *.swp
 *.swo
