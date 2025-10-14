@@ -11,3 +11,5 @@ build/
 .dockerignore
 .env.example
 argocd-password.txt
+cluster-setup.sh
+CLUSTER_SETUP.md
