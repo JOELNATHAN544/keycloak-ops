@@ -13,3 +13,7 @@ build/
 argocd-password.txt
 cluster-setup.sh
 CLUSTER_SETUP.md
+.vagrant/
+Vagrantfile
+cluster-disk.vdi
+kubeconfig
