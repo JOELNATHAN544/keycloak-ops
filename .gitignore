@@ -10,6 +10,7 @@ build/
 .vscode/
 .dockerignore
 .env.example
+argocd-password.txt
 
 # Python Virtual Environment
 venv/
