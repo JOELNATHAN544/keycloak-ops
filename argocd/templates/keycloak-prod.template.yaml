@@ -1,0 +1,89 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: keycloak-prod
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: keycloak
+  
+  source:
+    repoURL: ${REPO_URL}
+    targetRevision: ${PROD_TARGET_REVISION}
+    path: helm-chart
+    
+    helm:
+      valueFiles:
+        - values-prod.yaml
+      
+      values: |
+        replicaCount: 3
+        
+        image:
+          pullPolicy: IfNotPresent
+        
+        ingress:
+          enabled: true
+          hostname: ${PROD_DOMAIN}
+          tls:
+            enabled: true
+            secretName: keycloak-tls
+        
+        postgresql:
+          enabled: true
+          auth:
+            username: keycloak
+            database: keycloak_prod
+          primary:
+            persistence:
+              enabled: true
+              size: 10Gi
+        
+        resources:
+          limits:
+            cpu: 2000m
+            memory: 2Gi
+          requests:
+            cpu: 1000m
+            memory: 1Gi
+        
+        autoscaling:
+          enabled: true
+          minReplicas: 3
+          maxReplicas: 10
+          targetCPUUtilizationPercentage: 80
+        
+        health:
+          enabled: true
+        
+        metrics:
+          enabled: true
+      
+      releaseName: keycloak-prod
+  
+  destination:
+    server: ${K8S_SERVER}
+    namespace: ${PROD_NAMESPACE}
+  
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: false
+    
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+    
+    retry:
+      limit: 3
+      backoff:
+        duration: 10s
+        factor: 2
+        maxDuration: 5m
+  
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas
