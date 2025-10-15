@@ -1,4 +1,4 @@
-# Keycloak Operations Documentation
+# keycloak-ops Documentation
 
 A comprehensive documentation site for Keycloak Community Edition (CC) deployment and operations, built with MkDocs and hosted on GitHub Pages.
 
