@@ -4,10 +4,13 @@ metadata:
   name: keycloak-dev
   namespace: argocd
 spec:
-  project: keycloak-project
+  # Replaced hardcoded project name with a variable
+  project: ${ARGOCD_PROJECT_NAME}
   source:
-    repoURL: 'https://github.com/JOELNATHAN544/keycloak-ops.git'
-    targetRevision: argocd
+    # Reconstructed repo URL using GITHUB_USERNAME and GIT_REPO_NAME
+    repoURL: 'https://github.com/${GITHUB_USERNAME}/${GIT_REPO_NAME}.git'
+    # Replaced hardcoded branch name with a variable
+    targetRevision: ${GIT_BRANCH_DEV}
     path: charts/keycloak
     helm:
       valueFiles:
