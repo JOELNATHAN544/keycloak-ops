@@ -3,8 +3,11 @@ name: Deploy Documentation to GitHub Pages
 on:
   push:
     branches:
-      - main  
-  workflow_dispatch:  # Allow manual triggering
+      - main
+    paths:
+      - 'docs/**'
+      - 'mkdocs.yml'
+      - 'requirements.txt'
 
 permissions:
   contents: read
