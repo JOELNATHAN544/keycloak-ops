@@ -1,0 +1,15 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: keycloak-project
+  namespace: argocd
+spec:
+  description: Project for Keycloak Helm deployments
+  sourceRepos:
+    - '*'
+  destinations:
+    - namespace: keycloak
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
