@@ -10,6 +10,8 @@ spec:
   destinations:
     - namespace: keycloak
       server: https://kubernetes.default.svc
+    - namespace: keycloak-prod
+      server: https://kubernetes.default.svc
   clusterResourceWhitelist:
     - group: '*'
       kind: '*'
