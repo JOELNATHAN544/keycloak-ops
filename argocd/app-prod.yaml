@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: keycloak-prod
+  namespace: argocd
+spec:
+  project: keycloak-project
+  source:
+    repoURL: 'https://github.com/JOELNATHAN544/keycloak-ops.git'
+    targetRevision: main
+    path: charts/keycloak
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: keycloak-prod
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
