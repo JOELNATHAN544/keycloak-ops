@@ -4,7 +4,7 @@ Automated documentation site for Keycloak operations.
 
 ## Live Site
 
-[View Documentation](https://marc-jr.github.io/keycloak-ops/)
+[View Documentation](https://ADORSYS-GIS.github.io/keycloak-ops/)
 
 ## Development
 ```bash

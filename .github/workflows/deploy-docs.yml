@@ -3,8 +3,7 @@ name: Deploy Documentation to GitHub Pages
 on:
   push:
     branches:
-      - main
-      - pipeline-deployment  # Also deploy from your branch for testing
+      - main  
   workflow_dispatch:  # Allow manual triggering
 
 permissions:
