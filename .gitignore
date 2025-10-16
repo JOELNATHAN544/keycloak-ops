@@ -9,7 +9,7 @@ Cargo.lock
 build/
 .vscode/
 .dockerignore
-.env.example
+# .env.example
 argocd-password.txt
 cluster-setup.sh
 CLUSTER_SETUP.md
