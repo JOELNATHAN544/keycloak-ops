@@ -17,4 +17,4 @@ CLUSTER_SETUP.md
 Vagrantfile
 cluster-disk.vdi
 kubeconfig
-argocd/.env
+# argocd/.env
