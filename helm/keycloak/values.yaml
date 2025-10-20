@@ -1,0 +1,228 @@
+# Default values for keycloak
+replicaCount: 2
+
+image:
+  repository: quay.io/keycloak/keycloak
+  pullPolicy: IfNotPresent
+  tag: "26.4.0"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations:
+  # Prometheus scraping annotations
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "8080"
+  prometheus.io/path: "/metrics"
+
+podSecurityContext:
+  fsGroup: 1000
+
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: false
+  allowPrivilegeEscalation: false
+
+service:
+  type: ClusterIP
+  port: 8080
+  httpsPort: 8443
+  annotations: {}
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "128k"
+  hosts:
+    - host: keycloak.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: keycloak-tls
+      hosts:
+        - keycloak.example.com
+
+resources:
+  limits:
+    cpu: 2000m
+    memory: 2Gi
+  requests:
+    cpu: 500m
+    memory: 1Gi
+
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - keycloak
+          topologyKey: kubernetes.io/hostname
+
+# Keycloak configuration
+keycloak:
+  # Admin credentials (use secrets in production)
+  admin:
+    username: admin
+    # Password should be set via --set keycloak.admin.password=<password>
+    # or use existingSecret
+    password: ""
+    existingSecret: ""
+    existingSecretKey: "admin-password"
+
+  # Database configuration
+  database:
+    vendor: postgres
+    host: postgres-service
+    port: 5432
+    database: keycloak
+    username: keycloak
+    # Password should be set via --set or use existingSecret
+    password: ""
+    existingSecret: ""
+    existingSecretKey: "db-password"
+
+  # Proxy settings (for running behind ingress)
+  proxy: edge
+
+  # Health check paths
+  health:
+    enabled: true
+
+  # Metrics
+  metrics:
+    enabled: true
+
+  # Extra environment variables
+  extraEnv: []
+  # - name: KEYCLOAK_LOGLEVEL
+  #   value: INFO
+
+  # Extra init containers
+  extraInitContainers: []
+
+  # Extra volumes
+  extraVolumes: []
+
+  # Extra volume mounts
+  extraVolumeMounts: []
+
+# PostgreSQL subchart configuration (optional)
+postgresql:
+  enabled: false
+  image:
+    registry: docker.io
+    repository: postgres
+    tag: 15-alpine
+  auth:
+    username: keycloak
+    password: keycloak
+    database: keycloak
+  primary:
+    persistence:
+      enabled: true
+      size: 10Gi
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+      requests:
+        cpu: 250m
+        memory: 256Mi
+
+# Probes configuration
+# NOTE: In Keycloak 26.4.0+, health endpoints are on management port 9000
+livenessProbe:
+  httpGet:
+    path: /health/live
+    port: 9000
+  initialDelaySeconds: 90
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /health/ready
+    port: 9000
+  initialDelaySeconds: 60
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+startupProbe:
+  httpGet:
+    path: /health/started
+    port: 9000
+  initialDelaySeconds: 90
+  periodSeconds: 5
+  timeoutSeconds: 5
+  failureThreshold: 30
+
+# Network Policy configuration
+# Restricts network access to Keycloak pods for enhanced security
+networkPolicy:
+  enabled: false
+  ingress:
+    enabled: true
+    # Example: allow from nginx-ingress namespace
+    namespaceSelector:
+      matchLabels:
+        name: ingress-nginx
+    # Example: allow from specific pods
+    podSelector: {}
+  egress:
+    database:
+      enabled: true
+      namespaceSelector: {}
+      podSelector:
+        matchLabels:
+          app: postgres
+    external:
+      enabled: true
+    custom: []
+
+# ConfigMap for custom Keycloak configuration
+# Use this to mount custom themes, providers, or configuration files
+configMap:
+  enabled: false
+  # Custom configuration data
+  data: {}
+  # Example: Add custom realm configuration
+  # realm.json: |
+  #   {
+  #     "realm": "myrealm",
+  #     "enabled": true
+  #   }
+  # Mount path for the config map
+  mountPath: /opt/keycloak/data/import
+  # SubPath for specific files (optional)
+  subPath: ""

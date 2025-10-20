@@ -1,0 +1,83 @@
+# NetworkPolicy restricts network access to Keycloak pods
+# This implements a least-privilege network security model
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: keycloak
+  labels:
+    app.kubernetes.io/name: keycloak
+spec:
+  # Apply this policy to Keycloak pods
+  podSelector:
+    matchLabels:
+      app: keycloak
+
+  # Define allowed traffic types
+  policyTypes:
+    - Ingress
+    - Egress
+
+  # Ingress rules: who can connect to Keycloak
+  ingress:
+    # Allow traffic from ingress controller (adjust selectors as needed)
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              # This label is common for ingress-nginx, but may need adjustment
+              kubernetes.io/metadata.name: ingress-nginx
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 8080
+        - protocol: TCP
+          port: 8443
+
+    # Allow inter-pod communication for clustering (JGroups)
+    - from:
+        - podSelector:
+            matchLabels:
+              app: keycloak
+      ports:
+        - protocol: TCP
+          port: 7800
+        - protocol: TCP
+          port: 8080
+
+  # Egress rules: where Keycloak can connect to
+  egress:
+    # Allow DNS resolution
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+        - podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+
+    # Allow connection to PostgreSQL database
+    - to:
+        - podSelector:
+            matchLabels:
+              app: postgres
+      ports:
+        - protocol: TCP
+          port: 5432
+
+    # Allow HTTPS for external integrations (LDAP, OIDC providers, etc.)
+    - to:
+        # This allows egress to all IPs, which is broad.
+        # For stricter security, replace with specific CIDR blocks.
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 636  # LDAPS
