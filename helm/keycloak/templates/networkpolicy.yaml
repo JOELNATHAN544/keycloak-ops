@@ -1,0 +1,99 @@
+{{- if .Values.networkPolicy.enabled -}}
+# NetworkPolicy restricts network access to Keycloak pods
+# This implements a least-privilege network security model
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "keycloak.fullname" . }}
+  labels:
+    {{- include "keycloak.labels" . | nindent 4 }}
+spec:
+  # Apply this policy to Keycloak pods
+  podSelector:
+    matchLabels:
+      {{- include "keycloak.selectorLabels" . | nindent 6 }}
+  
+  # Define allowed traffic types
+  policyTypes:
+    - Ingress
+    - Egress
+  
+  # Ingress rules: who can connect to Keycloak
+  ingress:
+    # Allow traffic from ingress controller
+    {{- if .Values.networkPolicy.ingress.enabled }}
+    - from:
+        {{- if .Values.networkPolicy.ingress.namespaceSelector }}
+        - namespaceSelector:
+            {{- toYaml .Values.networkPolicy.ingress.namespaceSelector | nindent 12 }}
+        {{- end }}
+        {{- if .Values.networkPolicy.ingress.podSelector }}
+        - podSelector:
+            {{- toYaml .Values.networkPolicy.ingress.podSelector | nindent 12 }}
+        {{- end }}
+      ports:
+        - protocol: TCP
+          port: 8080
+        - protocol: TCP
+          port: 8443
+    {{- end }}
+    
+    # Allow inter-pod communication for clustering (JGroups)
+    - from:
+        - podSelector:
+            matchLabels:
+              {{- include "keycloak.selectorLabels" . | nindent 14 }}
+      ports:
+        - protocol: TCP
+          port: 7800
+        - protocol: TCP
+          port: 8080
+  
+  # Egress rules: where Keycloak can connect to
+  egress:
+    # Allow DNS resolution
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+        - podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    
+    # Allow connection to PostgreSQL database
+    {{- if .Values.networkPolicy.egress.database.enabled }}
+    - to:
+        {{- if .Values.networkPolicy.egress.database.namespaceSelector }}
+        - namespaceSelector:
+            {{- toYaml .Values.networkPolicy.egress.database.namespaceSelector | nindent 12 }}
+        {{- end }}
+        {{- if .Values.networkPolicy.egress.database.podSelector }}
+        - podSelector:
+            {{- toYaml .Values.networkPolicy.egress.database.podSelector | nindent 12 }}
+        {{- end }}
+      ports:
+        - protocol: TCP
+          port: {{ include "keycloak.dbPort" . }}
+    {{- end }}
+    
+    # Allow HTTPS for external integrations (LDAP, OIDC providers, etc.)
+    {{- if .Values.networkPolicy.egress.external.enabled }}
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 636  # LDAPS
+    {{- end }}
+    
+    # Additional custom egress rules
+    {{- with .Values.networkPolicy.egress.custom }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+{{- end }}

@@ -1,0 +1,25 @@
+# ConfigMap for custom Keycloak configuration
+# Use this to provide custom themes, providers, or realm configurations
+# To use this ConfigMap, you need to mount it in the Keycloak deployment
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: keycloak-config
+  labels:
+    app.kubernetes.io/name: keycloak
+data: {} # Remove the braces to add custom configuration
+  # empty by default
+  # Example: Add custom realm configuration
+  # realm.json: |
+  #   {
+  #     "realm": "myrealm",
+  #     "enabled": true,
+  #     "displayName": "My Realm"
+  #   }
+  #
+  # Example: Add custom theme files
+  # theme.properties: |
+  #   parent=keycloak
+  #   import=common/keycloak
+  #
+  # Add your custom configuration here as key-value pairs
