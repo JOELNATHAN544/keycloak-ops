@@ -4,12 +4,10 @@ on:
   push:
     branches:
       - main
-      - pipeline-deployment
     paths:
       - 'docs/**'
       - 'mkdocs.yml'
       - 'requirements.txt'
-  workflow_dispatch:
 
 permissions:
   contents: read
