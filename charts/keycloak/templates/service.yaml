@@ -1,0 +1,54 @@
+# Keycloak Service - Main Service
+# This service provides a stable endpoint for accessing Keycloak
+# Type: ClusterIP (internal) - use Ingress for external access
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "keycloak.fullname" . }}
+  labels:
+    {{- include "keycloak.labels" . | nindent 4 }}
+  # Optional annotations (e.g., for cloud load balancers)
+  {{- with .Values.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.service.type }}
+  # Service ports
+  ports:
+    # HTTP port for web traffic (typically behind ingress)
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+    # HTTPS port (optional, usually TLS termination at ingress)
+    - port: {{ .Values.service.httpsPort }}
+      targetPort: https
+      protocol: TCP
+      name: https
+  # Pod selector for routing traffic
+  selector:
+    {{- include "keycloak.selectorLabels" . | nindent 4 }}
+---
+# Keycloak Headless Service
+# Required for StatefulSet-like behavior and pod discovery (JGroups clustering)
+# This service allows pods to discover each other for distributed caching
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "keycloak.fullname" . }}-headless
+  labels:
+    {{- include "keycloak.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  # No cluster IP - allows direct pod-to-pod communication
+  clusterIP: None
+  # Include not-ready pods for cluster formation
+  publishNotReadyAddresses: true
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "keycloak.selectorLabels" . | nindent 4 }}
