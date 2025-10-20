@@ -2,7 +2,7 @@
 
 # --- Configuration ---
 ENV_FILE=".env"
-APPLICATIONS=("app-prod.yaml" "app-dev.yaml")
+APPLICATIONS=("app-prod.yaml" "app-dev.yaml" "app-keycloak-helm.yaml")
 
 # Check for the required 'envsubst' utility
 if ! command -v envsubst &> /dev/null
@@ -19,9 +19,6 @@ if [ ! -f "$ENV_FILE" ]; then
 fi
 
 echo "--- Loading variables from $ENV_FILE ---"
-
-# Load variables from .env file into the current shell environment
-# This script uses 'export' to make the variables available for envsubst
 export $(grep -v '^#' "$ENV_FILE" | xargs)
 
 echo "--- Applying ArgoCD Applications via kubectl ---"
@@ -33,10 +30,7 @@ for APP_FILE in "${APPLICATIONS[@]}"; do
     fi
 
     echo "Processing $APP_FILE..."
-    
-    # 1. Substitute variables in the YAML file using envsubst
-    # 2. Pipe the resulting, fully rendered YAML to kubectl apply
-    envsubst < "$APP_FILE" | kubectl apply -f -
+    envsubst < "$APP_FILE" | vagrant ssh -c "kubectl apply -f -"
     
     if [ $? -eq 0 ]; then
         echo "Successfully applied $APP_FILE."
