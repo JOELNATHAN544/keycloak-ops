@@ -2,7 +2,7 @@
 replicaCount: 2
 
 image:
-  repository: quay.io/keycloak/keycloak
+  repository: jboss/keycloak
   pullPolicy: IfNotPresent
   tag: "26.4.0"
 
