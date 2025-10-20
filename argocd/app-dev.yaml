@@ -11,12 +11,9 @@ spec:
     repoURL: 'https://github.com/${GITHUB_USERNAME}/${GIT_REPO_NAME}.git'
     # Replaced hardcoded branch name with a variable
     targetRevision: ${GIT_BRANCH_DEV}
-    path: charts/keycloak
+    path: charts/nginx
     helm:
-      releaseName: keycloak-dev
-      valueFiles:
-        - values.yaml
-        - values-dev.yaml
+      releaseName: nginx-dev
   destination:
     server: https://kubernetes.default.svc
     namespace: keycloak
