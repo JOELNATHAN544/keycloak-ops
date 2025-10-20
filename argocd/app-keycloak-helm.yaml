@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: 'https://github.com/JOELNATHAN544/keycloak-ops.git'
-    targetRevision: HEAD
+    targetRevision: argocd
     path: helm/keycloak
     helm:
       releaseName: keycloak
