@@ -11,7 +11,9 @@ spec:
     repoURL: 'https://github.com/${GITHUB_USERNAME}/${GIT_REPO_NAME}.git'
     # Replaced hardcoded branch name with a variable
     targetRevision: ${GIT_BRANCH_PROD}
-    path: charts/keycloak
+    path: keycloak-ops/helm/keycloak
+    helm:
+      releaseName: keycloak-prod
   destination:
     server: https://kubernetes.default.svc
     namespace: keycloak-prod
