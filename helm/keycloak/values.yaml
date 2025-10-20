@@ -34,7 +34,7 @@ securityContext:
   allowPrivilegeEscalation: false
 
 service:
-  type: ClusterIP
+  type: NodePort
   port: 8080
   httpsPort: 8443
   annotations: {}
