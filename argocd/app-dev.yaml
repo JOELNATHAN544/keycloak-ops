@@ -11,7 +11,7 @@ spec:
     repoURL: 'https://github.com/${GITHUB_USERNAME}/${GIT_REPO_NAME}.git'
     # Replaced hardcoded branch name with a variable
     targetRevision: ${GIT_BRANCH_DEV}
-    path: keycloak-ops/helm/keycloak
+    path: charts/keycloak
     helm:
       releaseName: keycloak-dev
       valueFiles:
