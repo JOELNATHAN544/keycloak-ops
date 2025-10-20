@@ -4,10 +4,10 @@ metadata:
   name: keycloak-helm
   namespace: argocd
 spec:
-  project: default
+  project: ${ARGOCD_PROJECT_NAME}
   source:
-    repoURL: 'https://github.com/JOELNATHAN544/keycloak-ops.git'
-    targetRevision: argocd
+    repoURL: 'https://github.com/${GITHUB_USERNAME}/${GIT_REPO_NAME}.git'
+    targetRevision: ${GIT_BRANCH_PROD}
     path: helm/keycloak
     helm:
       releaseName: keycloak
