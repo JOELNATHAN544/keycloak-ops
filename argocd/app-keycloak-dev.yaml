@@ -19,14 +19,15 @@ spec:
           auth:
             database: keycloak_dev
             username: keycloak_dev
+            password: "dev-password"
 
         keycloak:
           database:
-            host: "{{ .Release.Name }}-postgresql"
+            host: "keycloak-dev-postgresql"
             database: keycloak_dev
             username: keycloak_dev
-            existingSecret: "{{ .Release.Name }}-postgresql"
-            existingSecretKey: "postgresql-password"
+            existingSecret: "keycloak-dev-postgresql"
+            existingSecretKey: "password"
   destination:
     server: https://kubernetes.default.svc
     namespace: keycloak-dev
