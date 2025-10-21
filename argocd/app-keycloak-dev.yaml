@@ -3,6 +3,8 @@ kind: Application
 metadata:
   name: keycloak-dev
   namespace: argocd
+  annotations:
+    cascade.dev/refresh: "$(date +%s)"
 spec:
   project: ${ARGOCD_PROJECT_NAME}
   source:
