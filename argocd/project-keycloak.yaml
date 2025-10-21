@@ -8,8 +8,10 @@ spec:
   sourceRepos:
   - '*'
   destinations:
-  - namespace: '*'
-    server: '*'
+  - namespace: 'keycloak'
+    server: 'https://kubernetes.default.svc'
+  - namespace: 'keycloak-dev'
+    server: 'https://kubernetes.default.svc'
   clusterResourceWhitelist:
   - group: '*'
     kind: '*'
