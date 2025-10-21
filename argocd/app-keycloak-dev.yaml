@@ -22,10 +22,10 @@ spec:
           value: postgres-service.keycloak.svc.cluster.local
         - name: keycloak.database.database
           value: keycloak_dev
+        - name: keycloak.database.username
+          value: keycloak_dev
         - name: keycloak.database.password
           value: keycloak123
-        - name: keycloak.database.existingSecret
-          value: keycloak-db-secret
   destination:
     server: https://kubernetes.default.svc
     namespace: keycloak-dev

@@ -12,18 +12,14 @@ spec:
     helm:
       releaseName: keycloak
       parameters:
-        - name: image.repository
-          value: quay.io/keycloak/keycloak
-        - name: image.tag
-          value: "26.4.0"
         - name: keycloak.admin.password
           value: admin123
         - name: keycloak.database.host
           value: postgres-service
+        - name: keycloak.database.username
+          value: keycloak
         - name: keycloak.database.password
           value: keycloak123
-        - name: keycloak.database.existingSecret
-          value: keycloak-db-secret
   destination:
     server: https://kubernetes.default.svc
     namespace: keycloak
