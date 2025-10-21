@@ -4,7 +4,7 @@ metadata:
   name: keycloak-dev
   namespace: argocd
   annotations:
-    cascade.dev/refresh: "force-sync-2"
+    cascade.dev/refresh: "force-sync-3"
 spec:
   project: ${ARGOCD_PROJECT_NAME}
   source:
