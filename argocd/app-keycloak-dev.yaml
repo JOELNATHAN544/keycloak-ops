@@ -10,7 +10,16 @@ spec:
   source:
     repoURL: 'https://github.com/${GITHUB_USERNAME}/${GIT_REPO_NAME}.git'
     targetRevision: ${GIT_BRANCH_DEV}
-    path: manifests/keycloak-dev
+    path: helm/keycloak
+    helm:
+      releaseName: keycloak-dev
+      parameters:
+        - name: keycloak.database.host
+          value: postgres-service.keycloak.svc.cluster.local
+        - name: keycloak.database.database
+          value: keycloak_dev
+        - name: keycloak.database.existingSecret
+          value: keycloak-db-secret
   destination:
     server: https://kubernetes.default.svc
     namespace: keycloak-dev
