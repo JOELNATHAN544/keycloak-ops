@@ -13,11 +13,10 @@ spec:
       releaseName: keycloak-dev
       valueFiles:
         - values.yaml
+        - values-dev.yaml
       parameters:
         - name: keycloak.admin.password
           value: admin123
-        - name: keycloak.database.password
-          value: keycloak123
   destination:
     server: https://kubernetes.default.svc
     namespace: keycloak-dev
