@@ -6,7 +6,7 @@ metadata:
   annotations:
     cascade.dev/refresh: "force-sync-9"
 spec:
-  project: ${ARGOCD_PROJECT_NAME}
+  project: keycloak-project
   source:
     repoURL: 'https://github.com/${GITHUB_USERNAME}/${GIT_REPO_NAME}.git'
     targetRevision: ${GIT_BRANCH_DEV}
