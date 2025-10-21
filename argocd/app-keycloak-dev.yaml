@@ -4,30 +4,13 @@ metadata:
   name: keycloak-dev
   namespace: argocd
   annotations:
-    cascade.dev/refresh: "force-sync-6"
+    cascade.dev/refresh: "force-sync-9"
 spec:
   project: ${ARGOCD_PROJECT_NAME}
   source:
     repoURL: 'https://github.com/${GITHUB_USERNAME}/${GIT_REPO_NAME}.git'
     targetRevision: ${GIT_BRANCH_DEV}
-    path: helm/keycloak
-    helm:
-      releaseName: keycloak-dev
-      values: |
-        postgresql:
-          enabled: true
-          auth:
-            database: keycloak_dev
-            username: keycloak_dev
-            password: "dev-password"
-
-        keycloak:
-          database:
-            host: "keycloak-dev-postgresql"
-            database: keycloak_dev
-            username: keycloak_dev
-            existingSecret: "keycloak-dev-postgresql"
-            existingSecretKey: "password"
+    path: manifests/keycloak-dev
   destination:
     server: https://kubernetes.default.svc
     namespace: keycloak-dev
