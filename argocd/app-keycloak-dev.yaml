@@ -4,7 +4,7 @@ metadata:
   name: keycloak-dev
   namespace: argocd
   annotations:
-    cascade.dev/refresh: "$(date +%s)"
+    cascade.dev/refresh: "force-sync-2"
 spec:
   project: ${ARGOCD_PROJECT_NAME}
   source:
@@ -37,24 +37,19 @@ spec:
         - name: keycloak.database.existingSecretKey
           value: postgresql-password
         # Force override of environment variables
-        - name: keycloak.extraEnv[0].name
-          value: KC_DB_URL_HOST
-        - name: keycloak.extraEnv[0].value
-          value: keycloak-dev-postgresql
-        - name: keycloak.extraEnv[1].name
-          value: KC_DB_DATABASE
-        - name: keycloak.extraEnv[1].value
-          value: keycloak_dev
-        - name: keycloak.extraEnv[2].name
-          value: KC_DB_USERNAME
-        - name: keycloak.extraEnv[2].value
-          value: keycloak_dev
-        - name: keycloak.extraEnv[3].name
-          value: KC_DB_PASSWORD
-        - name: keycloak.extraEnv[3].valueFrom.secretKeyRef.name
-          value: keycloak-dev-postgresql
-        - name: keycloak.extraEnv[3].valueFrom.secretKeyRef.key
-          value: postgresql-password
+        - name: keycloak.extraEnv
+          value: |
+            - name: KC_DB_URL_HOST
+              value: keycloak-dev-postgresql
+            - name: KC_DB_DATABASE
+              value: keycloak_dev
+            - name: KC_DB_USERNAME
+              value: keycloak_dev
+            - name: KC_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-dev-postgresql
+                  key: postgresql-password
   destination:
     server: https://kubernetes.default.svc
     namespace: keycloak-dev
