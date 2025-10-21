@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: keycloak-prod
+  namespace: argocd
+spec:
+  project: ${ARGOCD_PROJECT_NAME}
+  source:
+    repoURL: 'https://github.com/${GITHUB_USERNAME}/${GIT_REPO_NAME}.git'
+    targetRevision: ${GIT_BRANCH_PROD}
+    path: helm/keycloak
+    helm:
+      releaseName: keycloak
+      valueFiles:
+        - values.yaml
+      parameters:
+        - name: keycloak.admin.password
+          value: admin123
+        - name: keycloak.database.password
+          value: keycloak123
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: keycloak
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
