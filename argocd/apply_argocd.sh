@@ -2,7 +2,7 @@
 
 # --- Configuration ---
 ENV_FILE=".env"
-APPLICATIONS=("project-keycloak.yaml" "app-keycloak-helm.yaml")
+APPLICATIONS=("project-keycloak.yaml" "app-keycloak-dev.yaml" "app-keycloak-prod.yaml")
 
 # Check for the required 'envsubst' utility
 if ! command -v envsubst &> /dev/null
