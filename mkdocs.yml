@@ -24,3 +24,4 @@ theme:
 nav:
   - Home: index.md
   - Documentation: documentation.md
+  - Contributing: contributing.md
