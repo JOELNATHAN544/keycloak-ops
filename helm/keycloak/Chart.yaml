@@ -4,6 +4,10 @@ description: A Helm chart for deploying Keycloak on Kubernetes
 type: application
 version: 1.0.0
 appVersion: "26.4.0"
+dependencies:
+- name: postgresql
+  version: "15.5.1"
+  repository: "https://charts.bitnami.com/bitnami"
 keywords:
   - keycloak
   - identity

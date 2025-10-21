@@ -107,7 +107,15 @@ keycloak:
   extraVolumeMounts: []
 
 postgresql:
-  enabled: false
+  enabled: true
+  auth:
+    database: keycloak
+    username: keycloak
+    password: ""
+  primary:
+    persistence:
+      enabled: true
+      size: 10Gi
 
 livenessProbe:
   httpGet:
