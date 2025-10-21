@@ -6,18 +6,14 @@ This guide explains how to add new pages or documentation to the Keycloak Operat
 
 ### Step 1: Create the Markdown File
 
-Create a new `.md` file in the appropriate directory under `docs/`. Use descriptive filenames with hyphens for spaces:
-
-- For general documentation: `docs/your-page-name.md`
-- For getting started guides: `docs/getting-started/your-guide.md`
-- For installation docs: `docs/installation/your-topic.md`
-- For operations: `docs/operations/your-operation.md`
-- For reference: `docs/reference/your-reference.md`
+Create a new `.md` file in the `docs/` directory. Use descriptive filenames with hyphens for spaces:
+```bash
+docs/your-page-name.md
+```
 
 ### Step 2: Write the Content
 
 Use standard Markdown syntax:
-
 ```markdown
 # Page Title
 
@@ -41,14 +37,12 @@ More content...
 ### Step 3: Add to Navigation
 
 Edit `mkdocs.yml` and add your new page to the `nav` section:
-
 ```yaml
 nav:
   - Home: index.md
   - Documentation: documentation.md
-  - Your Page: your-page-name.md
+  - Your New Page: your-page-name.md
 ```
-
 For nested navigation:
 
 ```yaml
@@ -58,22 +52,25 @@ nav:
     - Overview: getting-started/overview.md
     - Quick Start: getting-started/quick-start.md
     - Your New Guide: getting-started/your-guide.md
+
 ```
 
 ### Step 4: Test Locally
 
 Run the documentation site locally to verify:
-
 ```bash
+# Activate virtual environment
+source venv/bin/activate
+
+# Start local server
 mkdocs serve
 ```
 
 Visit `http://localhost:8000` to preview your changes.
 
 ### Step 5: Commit and Push
-
 ```bash
-git add .
+git add docs/your-page-name.md mkdocs.yml
 git commit -m "Add new documentation page: [page title]"
 git push
 ```
@@ -86,37 +83,30 @@ git push
 - Keep lines under 80 characters for readability
 - Use relative links for internal documentation
 - Include code examples where helpful
-- Test all links and code snippets
+- Test all links and code snippets before committing
 
-## Directory Structure
-
+## Current Directory Structure
 ```
-docs/
-├── index.md                 # Home page
-├── documentation.md         # Main documentation page
-├── getting-started/
-│   ├── overview.md
-│   ├── quick-start.md
-│   └── prerequisites.md
-├── installation/
-│   ├── guide.md
-│   └── configuration.md
-├── operations/
-│   ├── deployment.md
-│   ├── monitoring.md
-│   └── troubleshooting.md
-├── reference/
-│   ├── api.md
-│   └── config.md
-├── architecture.md
-├── changelog.md
-└── contributing.md          # This file
+keycloak-ops/
+├── .github/
+│   └── workflows/
+│       └── deploy-docs.yml    # GitHub Actions deployment workflow
+├── docs/
+│   ├── index.md               # Home page
+│   ├── documentation.md       # Main documentation page
+│   └── contributing.md        # This file
+├── venv/                      # Virtual environment (not in git)
+├── .gitignore
+├── mkdocs.yml                 # MkDocs configuration
+├── requirements.txt           # Python dependencies
+└── README.md                  # Project overview
 ```
 
 ## Need Help?
 
-If you need assistance or have questions about contributing documentation, please:
+If you need assistance or have questions about contributing documentation:
 
-1. Check existing documentation for examples
-2. Review the MkDocs documentation: https://www.mkdocs.org/
-3. Open an issue on GitHub for questions
+1. Check existing documentation files (`index.md`, `documentation.md`) for examples
+2. Review the [MkDocs documentation](https://www.mkdocs.org/)
+3. Review the [Material for MkDocs documentation](https://squidfunk.github.io/mkdocs-material/)
+4. Open an issue on [GitHub](https://github.com/ADORSYS-GIS/keycloak-ops/issues) for questions
