@@ -1,0 +1,146 @@
+# Default values for keycloak
+replicaCount: 2
+
+image:
+  repository: quay.io/keycloak/keycloak
+  pullPolicy: IfNotPresent
+  tag: "26.4.0"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "8080"
+  prometheus.io/path: "/metrics"
+
+podSecurityContext:
+  fsGroup: 1000
+
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: false
+  allowPrivilegeEscalation: false
+
+service:
+  type: NodePort
+  port: 8080
+  httpsPort: 8443
+  annotations: {}
+
+ingress:
+  enabled: false # Disabling ingress as we are using NodePort
+
+resources:
+  limits:
+    cpu: 2000m
+    memory: 2Gi
+  requests:
+    cpu: 500m
+    memory: 1Gi
+
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - keycloak
+          topologyKey: kubernetes.io/hostname
+
+keycloak:
+  admin:
+    username: admin
+    password: ""
+    existingSecret: ""
+    existingSecretKey: "admin-password"
+
+  database:
+    vendor: postgres
+    host: "{{ .Release.Name }}-postgresql"
+    port: 5432
+    database: keycloak_dev
+    username: keycloak_dev
+    password: ""
+    existingSecret: "{{ .Release.Name }}-postgresql"
+    existingSecretKey: "postgresql-password"
+
+  proxy: edge
+
+  health:
+    enabled: true
+
+  metrics:
+    enabled: true
+
+  extraEnv:
+    - name: KC_HOSTNAME
+      value: "192.168.56.10"
+
+  extraInitContainers: []
+  extraVolumes: []
+  extraVolumeMounts: []
+
+postgresql:
+  enabled: true
+  auth:
+    database: keycloak_dev
+    username: keycloak_dev
+
+livenessProbe:
+  httpGet:
+    path: /health/live
+    port: 9000
+  initialDelaySeconds: 90
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /health/ready
+    port: 9000
+  initialDelaySeconds: 60
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+startupProbe:
+  httpGet:
+    path: /health/started
+    port: 9000
+  initialDelaySeconds: 90
+  periodSeconds: 5
+  timeoutSeconds: 5
+  failureThreshold: 30
+
+networkPolicy:
+  enabled: false
+
+configMap:
+  enabled: false
