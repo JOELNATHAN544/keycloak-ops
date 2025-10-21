@@ -4,7 +4,7 @@ metadata:
   name: keycloak-prod
   namespace: argocd
 spec:
-  project: keycloak-project
+  project: ${ARGOCD_PROJECT_NAME}
   source:
     repoURL: 'https://github.com/${GITHUB_USERNAME}/${GIT_REPO_NAME}.git'
     targetRevision: ${GIT_BRANCH_PROD}
