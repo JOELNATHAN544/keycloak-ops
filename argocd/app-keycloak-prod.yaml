@@ -12,10 +12,6 @@ spec:
     helm:
       releaseName: keycloak
       parameters:
-        - name: image.repository
-          value: quay.io/keycloak/keycloak
-        - name: image.tag
-          value: "26.4.0"
         - name: keycloak.admin.password
           value: admin123
         - name: keycloak.database.host
