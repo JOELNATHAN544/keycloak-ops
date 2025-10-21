@@ -10,9 +10,23 @@ spec:
   source:
     repoURL: 'https://github.com/${GITHUB_USERNAME}/${GIT_REPO_NAME}.git'
     targetRevision: ${GIT_BRANCH_DEV}
-    path: helm/keycloak-dev
+    path: helm/keycloak
     helm:
       releaseName: keycloak-dev
+      values: |
+        postgresql:
+          enabled: true
+          auth:
+            database: keycloak_dev
+            username: keycloak_dev
+
+        keycloak:
+          database:
+            host: "{{ .Release.Name }}-postgresql"
+            database: keycloak_dev
+            username: keycloak_dev
+            existingSecret: "{{ .Release.Name }}-postgresql"
+            existingSecretKey: "postgresql-password"
   destination:
     server: https://kubernetes.default.svc
     namespace: keycloak-dev
