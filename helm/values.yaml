@@ -159,3 +159,11 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+keycloak:
+  admin:
+    user: admin
+  database:
+    host: postgres-service
+    database: keycloak
+    existingSecret: keycloak-db-secret

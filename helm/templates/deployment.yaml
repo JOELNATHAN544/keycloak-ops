@@ -42,7 +42,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: KEYCLOAK_ADMIN
-              value: "{{ .Values.keycloak.admin.user | default \"admin\" }}"
+              value: {{ .Values.keycloak.admin.user | default "admin" | quote }}
             - name: KEYCLOAK_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
