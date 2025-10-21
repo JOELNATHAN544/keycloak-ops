@@ -4,7 +4,7 @@ metadata:
   name: keycloak-dev
   namespace: argocd
   annotations:
-    cascade.dev/refresh: "force-sync-3"
+    cascade.dev/refresh: "force-sync-5"
 spec:
   project: ${ARGOCD_PROJECT_NAME}
   source:
@@ -15,7 +15,7 @@ spec:
       releaseName: keycloak-dev
   destination:
     server: https://kubernetes.default.svc
-    namespace: keycloak-dev
+    namespace: keycloak
   syncPolicy:
     automated:
       prune: true
