@@ -1,26 +1,18 @@
 {{- if .Values.autoscaling.enabled }}
-# Horizontal Pod Autoscaler (HPA)
-# Automatically scales Keycloak pods based on CPU/Memory utilization
-# Requires Metrics Server to be installed in the cluster
-# NOTE: When HPA is enabled, spec.replicas in Deployment is ignored
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "keycloak.fullname" . }}
+  name: {{ include "helm.fullname" . }}
   labels:
-    {{- include "keycloak.labels" . | nindent 4 }}
+    {{- include "helm.labels" . | nindent 4 }}
 spec:
-  # Target deployment to scale
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "keycloak.fullname" . }}
-  # Minimum and maximum number of replicas
+    name: {{ include "helm.fullname" . }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
-  # Metrics to monitor for scaling decisions
   metrics:
-    # CPU-based scaling
     {{- if .Values.autoscaling.targetCPUUtilizationPercentage }}
     - type: Resource
       resource:
@@ -29,7 +21,6 @@ spec:
           type: Utilization
           averageUtilization: {{ .Values.autoscaling.targetCPUUtilizationPercentage }}
     {{- end }}
-    # Memory-based scaling
     {{- if .Values.autoscaling.targetMemoryUtilizationPercentage }}
     - type: Resource
       resource:

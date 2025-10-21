@@ -1,24 +1,18 @@
 {{- if .Values.ingress.enabled -}}
-# Keycloak Ingress
-# Provides external HTTPS access to Keycloak
-# Requires an Ingress Controller (e.g., NGINX, Traefik)
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "keycloak.fullname" . }}
+  name: {{ include "helm.fullname" . }}
   labels:
-    {{- include "keycloak.labels" . | nindent 4 }}
-  # Annotations for ingress behavior (cert-manager, proxy settings, etc.)
+    {{- include "helm.labels" . | nindent 4 }}
   {{- with .Values.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  # Ingress class (nginx, traefik, etc.)
-  {{- if .Values.ingress.className }}
-  ingressClassName: {{ .Values.ingress.className }}
+  {{- with .Values.ingress.className }}
+  ingressClassName: {{ . }}
   {{- end }}
-  # TLS configuration - use cert-manager for automatic certificate provisioning
   {{- if .Values.ingress.tls }}
   tls:
     {{- range .Values.ingress.tls }}
@@ -26,11 +20,9 @@ spec:
         {{- range .hosts }}
         - {{ . | quote }}
         {{- end }}
-      # Secret containing TLS certificate (created by cert-manager or manually)
       secretName: {{ .secretName }}
     {{- end }}
   {{- end }}
-  # Routing rules
   rules:
     {{- range .Values.ingress.hosts }}
     - host: {{ .host | quote }}
@@ -38,10 +30,12 @@ spec:
         paths:
           {{- range .paths }}
           - path: {{ .path }}
-            pathType: {{ .pathType }}
+            {{- with .pathType }}
+            pathType: {{ . }}
+            {{- end }}
             backend:
               service:
-                name: {{ include "keycloak.fullname" $ }}
+                name: {{ include "helm.fullname" $ }}
                 port:
                   number: {{ $.Values.service.port }}
           {{- end }}
