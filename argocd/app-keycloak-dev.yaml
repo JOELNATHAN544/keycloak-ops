@@ -21,9 +21,9 @@ spec:
         - name: keycloak.database.host
           value: postgres-service.keycloak
         - name: keycloak.database.database
-          value: keycloak_dev
+          value: keycloak
         - name: keycloak.database.username
-          value: keycloak_dev
+          value: keycloak
         - name: keycloak.database.password
           value: keycloak123
   destination:
