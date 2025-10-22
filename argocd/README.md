@@ -28,21 +28,21 @@ All ArgoCD-related configurations are located within this `argocd/` directory.
 
 Follow these steps to bring up the environment and access the services.
 
-### a. Start the Cluster
+### a. Prepare Your Kubernetes Cluster
 
-First, bring up the local Kubernetes cluster using Vagrant. From the root of the project, run:
+This project requires a running Kubernetes cluster with ArgoCD installed. The setup is environment-agnostic and can be run in any cluster (e.g., local `k3s`, `minikube`, or a cloud provider).
 
-```bash
-vagrant up
-```
-
-This will create a virtual machine, install k3s (Kubernetes), and install ArgoCD. The IP address for the cluster is defined in the `Vagrantfile` (default is `192.168.56.10`).
+Ensure your `kubectl` is configured to point to the correct cluster where you intend to deploy Keycloak.
 
 ### b. Apply the ArgoCD Applications
 
-Once the cluster is running, you need to tell ArgoCD about the applications it needs to manage. From the `argocd/` directory, run the apply script:
+Once your cluster is ready, you need to apply the ArgoCD application manifests. **Log into a shell environment that has access to your cluster**, navigate to the `argocd/` directory, and run the apply script:
 
 ```bash
+# Example for Vagrant users:
+# vagrant ssh -c "cd /vagrant/argocd && ./apply_argocd.sh"
+
+# For other environments, get a shell inside your cluster and run:
 cd argocd
 ./apply_argocd.sh
 ```
@@ -51,31 +51,31 @@ This will create the `AppProject` and the three `Applications` (postgres, keyclo
 
 ### c. Accessing the Services
 
-The services are exposed via `NodePort` on the cluster's IP address. The IP is configured in the `Vagrantfile` (default `192.168.56.10`), but the ports are assigned dynamically. Use the following commands to find the correct ports and construct the URLs.
+The services are exposed via `NodePort`. To access them, you will need the IP address of your Kubernetes node and the dynamically assigned port for each service.
 
 - **ArgoCD UI:**
-  - **Get Port:** The ArgoCD port is fixed at `30080`.
-  - **URL:** `http://192.168.56.10:30080`
+  - **Get Port:** The ArgoCD `NodePort` is fixed at **`30080`**.
+  - **URL:** `http://<YOUR_CLUSTER_IP>:30080`
   - **Username:** `admin`
-  - **Password:** Retrieve the auto-generated password with this command:
+  - **Password:** Retrieve the auto-generated password with this command (run from a shell with cluster access):
     ```bash
-    vagrant ssh -c "kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d"
+    kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d
     ```
 
 - **Keycloak (Development Environment):**
   - **Get Port:** Find the `NodePort` for the `keycloak-dev-helm` service:
     ```bash
-    vagrant ssh -c "kubectl get svc -n keycloak-dev keycloak-dev-helm -o jsonpath='{.spec.ports[0].nodePort}'"
+    kubectl get svc -n keycloak-dev keycloak-dev-helm -o jsonpath='{.spec.ports[0].nodePort}'
     ```
-  - **URL:** `http://192.168.56.10:<DEV_NODE_PORT>`
+  - **URL:** `http://<YOUR_CLUSTER_IP>:<DEV_NODE_PORT>`
   - **Admin Username:** `admin`
   - **Admin Password:** `admin123`
 
 - **Keycloak (Production Environment):**
   - **Get Port:** Find the `NodePort` for the `keycloak-helm` service:
     ```bash
-    vagrant ssh -c "kubectl get svc -n keycloak keycloak-helm -o jsonpath='{.spec.ports[0].nodePort}'"
+    kubectl get svc -n keycloak keycloak-helm -o jsonpath='{.spec.ports[0].nodePort}'
     ```
-  - **URL:** `http://192.168.56.10:<PROD_NODE_PORT>`
+  - **URL:** `http://<YOUR_CLUSTER_IP>:<PROD_NODE_PORT>`
   - **Admin Username:** `admin`
   - **Admin Password:** `admin123`
