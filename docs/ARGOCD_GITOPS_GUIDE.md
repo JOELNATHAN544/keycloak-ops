@@ -79,3 +79,51 @@ The services are exposed via `NodePort`. To access them, you will need the IP ad
   - **URL:** `http://<YOUR_CLUSTER_IP>:<PROD_NODE_PORT>`
   - **Admin Username:** `admin`
   - **Admin Password:** `admin123`
+
+## 4. Verifying the Deployment
+
+Once the applications are synced, you can use the following commands from a shell with cluster access to inspect the status of the various components.
+
+### a. Check ArgoCD Applications
+
+See the sync and health status of all managed applications:
+
+```bash
+kubectl get applications -n argocd
+```
+
+### b. Check Deployed Pods
+
+- **Check Production Pods (Keycloak & Postgres):**
+  ```bash
+  kubectl get pods -n keycloak
+  ```
+
+- **Check Development Pods (Keycloak only):**
+  ```bash
+  kubectl get pods -n keycloak-dev
+  ```
+
+### c. Check Services and Ports
+
+- **Check Production Services:**
+  ```bash
+  kubectl get svc -n keycloak
+  ```
+
+- **Check Development Services:**
+  ```bash
+  kubectl get svc -n keycloak-dev
+  ```
+
+### d. View Application Logs
+
+- **Follow Production Keycloak Logs:**
+  ```bash
+  kubectl logs -n keycloak -l app.kubernetes.io/instance=keycloak-helm -f
+  ```
+
+- **Follow Development Keycloak Logs:**
+  ```bash
+  kubectl logs -n keycloak-dev -l app.kubernetes.io/instance=keycloak-dev -f
+  ```
