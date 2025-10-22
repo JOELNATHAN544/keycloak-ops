@@ -24,21 +24,58 @@ All ArgoCD-related configurations are located within this `argocd/` directory.
 - `.env`: A configuration file that holds environment-specific variables (like the Git repository URL and branch/tag names) used by the `apply_argocd.sh` script.
 - `apply_argocd.sh`: A helper script that applies all our ArgoCD `Application` and `AppProject` manifests to the Kubernetes cluster.
 
-## 3. How to Test the Setup
+## 3. Initial Setup and Testing
 
-The entire environment is running and fully functional. You can access the different components using the following URLs:
+Follow these steps to bring up the environment and access the services.
+
+### a. Start the Cluster
+
+First, bring up the local Kubernetes cluster using Vagrant. From the root of the project, run:
+
+```bash
+vagrant up
+```
+
+This will create a virtual machine, install k3s (Kubernetes), and install ArgoCD. The IP address for the cluster is defined in the `Vagrantfile` (default is `192.168.56.10`).
+
+### b. Apply the ArgoCD Applications
+
+Once the cluster is running, you need to tell ArgoCD about the applications it needs to manage. From the `argocd/` directory, run the apply script:
+
+```bash
+cd argocd
+./apply_argocd.sh
+```
+
+This will create the `AppProject` and the three `Applications` (postgres, keycloak-dev, keycloak-prod) in ArgoCD. ArgoCD will then automatically sync them with the configurations in this Git repository.
+
+### c. Accessing the Services
+
+The services are exposed via `NodePort` on the cluster's IP address. The IP is configured in the `Vagrantfile` (default `192.168.56.10`), but the ports are assigned dynamically. Use the following commands to find the correct ports and construct the URLs.
 
 - **ArgoCD UI:**
+  - **Get Port:** The ArgoCD port is fixed at `30080`.
   - **URL:** `http://192.168.56.10:30080`
   - **Username:** `admin`
-  - **Password:** The password is automatically generated when the Vagrant VM is created. You can retrieve the current password by running `vagrant ssh -c "kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d"` from the project root.
+  - **Password:** Retrieve the auto-generated password with this command:
+    ```bash
+    vagrant ssh -c "kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d"
+    ```
 
 - **Keycloak (Development Environment):**
-  - **URL:** `http://192.168.56.10:30569`
+  - **Get Port:** Find the `NodePort` for the `keycloak-dev-helm` service:
+    ```bash
+    vagrant ssh -c "kubectl get svc -n keycloak-dev keycloak-dev-helm -o jsonpath='{.spec.ports[0].nodePort}'"
+    ```
+  - **URL:** `http://192.168.56.10:<DEV_NODE_PORT>`
   - **Admin Username:** `admin`
   - **Admin Password:** `admin123`
 
 - **Keycloak (Production Environment):**
-  - **URL:** `http://192.168.56.10:32525`
+  - **Get Port:** Find the `NodePort` for the `keycloak-helm` service:
+    ```bash
+    vagrant ssh -c "kubectl get svc -n keycloak keycloak-helm -o jsonpath='{.spec.ports[0].nodePort}'"
+    ```
+  - **URL:** `http://192.168.56.10:<PROD_NODE_PORT>`
   - **Admin Username:** `admin`
   - **Admin Password:** `admin123`
