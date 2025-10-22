@@ -9,7 +9,6 @@ Cargo.lock
 build/
 .vscode/
 .dockerignore
-# .env.example
 argocd-password.txt
 cluster-setup.sh
 CLUSTER_SETUP.md
@@ -17,4 +16,3 @@ CLUSTER_SETUP.md
 Vagrantfile
 cluster-disk.vdi
 kubeconfig
-# argocd/.env
