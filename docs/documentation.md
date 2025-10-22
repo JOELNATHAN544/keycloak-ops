@@ -15,6 +15,7 @@ To get started with Keycloak:
 
 ## Resources
 
+- [ArgoCD GitOps Deployment Guide](./ARGOCD_GITOPS_GUIDE.md)
 - [Official Keycloak Documentation](https://www.keycloak.org/documentation)
 - [GitHub Repository](https://github.com/ADORSYS-GIS/keycloak-ops)
 
