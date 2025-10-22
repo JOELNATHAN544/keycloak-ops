@@ -19,7 +19,7 @@ spec:
         - name: keycloak.admin.password
           value: admin123
         - name: keycloak.database.host
-          value: postgres-service.keycloak.svc.cluster.local
+          value: postgres-service.keycloak
         - name: keycloak.database.database
           value: keycloak_dev
         - name: keycloak.database.username
