@@ -30,7 +30,7 @@ for APP_FILE in "${APPLICATIONS[@]}"; do
     fi
 
     echo "Processing $APP_FILE..."
-    envsubst < "$APP_FILE" | vagrant ssh -c "kubectl apply -f -"
+    envsubst < "$APP_FILE" | kubectl apply -f -
     
     if [ $? -eq 0 ]; then
         echo "Successfully applied $APP_FILE."
