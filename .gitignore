@@ -1,10 +1,7 @@
 *.log
 logs/
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
 /target/
 Cargo.lock
 *.jar
