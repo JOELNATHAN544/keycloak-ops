@@ -21,38 +21,77 @@ Run the following commands from a shell with access to your cluster.
   kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
   ```
 
-## 3. Exposing Services with Ingress
+## 3. Exposing the ArgoCD UI with Ingress
 
-To expose services like the ArgoCD UI and other applications, we will use an Ingress controller.
+This section explains how to expose the ArgoCD UI securely using an NGINX Ingress controller with host-based routing. This is the most stable method for production-like environments.
 
-- **Install NGINX Ingress Controller:**
-  ```bash
-  kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.10.1/deploy/static/provider/cloud/deploy.yaml
-  ```
+### Step 1: Install NGINX Ingress Controller
 
-- **Wait for the Controller to be Ready:**
-  ```bash
-  kubectl wait --namespace ingress-nginx --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=120s
-  ```
+If you haven't already, deploy the Ingress controller to your cluster.
 
-## 4. Accessing the Environment
+```bash
+# This command deploys the necessary resources for the NGINX Ingress controller.
+kubecl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.10.1/deploy/static/provider/cloud/deploy.yaml
+```
 
-- **Get Your Cluster IP and Ingress Port:**
-  You will need the IP address of one of your Kubernetes nodes and the port assigned to the Ingress controller.
-  ```bash
-  # Get the IP
-  kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}'
+Wait for the controller to be ready:
+```bash
+# This command pauses until the Ingress controller pod is up and running.
+kubectl wait --namespace ingress-nginx --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=120s
+```
 
-  # Get the Port
-  kubectl get svc ingress-nginx-controller --namespace=ingress-nginx -o jsonpath='{.spec.ports[0].nodePort}'
-  ```
+### Step 2: Generate a TLS Certificate
 
-- **Accessing Services via Ingress:**
-  To access services like the ArgoCD UI, you must create an `Ingress` resource for them. This typically involves defining a path that maps to the service in the cluster.
+For HTTPS, we need a TLS certificate. The following commands create a self-signed certificate for local testing.
 
-  For example, to expose the ArgoCD server, you would create an Ingress that routes a path like `/argocd` to the `argocd-server` service on port 80.
+```bash
+# 1. Generate a private key and a self-signed certificate for the hostname 'argocd.local'.
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+  -keyout /tmp/tls.key -out /tmp/tls.crt -subj "/CN=argocd.local"
 
-  - **Example URL:** `http://<YOUR_CLUSTER_IP>:<INGRESS_PORT>/<your-path>`
+# 2. Create a Kubernetes secret to store the key and certificate.
+# The Ingress controller will use this secret to terminate TLS.
+kubectl create secret tls argocd-tls --key /tmp/tls.key --cert /tmp/tls.crt -n argocd
+```
+
+### Step 3: Apply the Ingress Manifest
+
+This project includes a pre-configured Ingress manifest to expose the ArgoCD server.
+
+```bash
+# This command applies the Ingress rule defined in the YAML file.
+# It configures the Ingress controller to route traffic for 'argocd.local' to the ArgoCD server.
+kubectl apply -f ../argocd/argocd-server-ingress.yaml
+```
+
+## 4. Accessing the UI
+
+### Step 1: Configure Your Local 'hosts' File
+
+You must tell your local computer how to resolve the `argocd.local` hostname. Add the following line to your `hosts` file:
+
+- **On Linux/macOS:** `/etc/hosts`
+- **On Windows:** `C:\Windows\System32\drivers\etc\hosts`
+
+```
+# Replace <YOUR_CLUSTER_IP> with the private IP of your Vagrant VM (e.g., 192.168.56.10).
+<YOUR_CLUSTER_IP>    argocd.local
+```
+
+### Step 2: Get the HTTPS Port
+
+The Ingress controller listens for HTTPS traffic on a specific `NodePort`. Find it with this command:
+
+```bash
+# This command retrieves the port assigned for HTTPS traffic (port 443).
+kubectl get svc ingress-nginx-controller -n ingress-nginx -o jsonpath='{.spec.ports[1].nodePort}'
+```
+
+### Step 3: Open in Browser
+
+You can now access the ArgoCD UI. Your browser will show a security warning because the certificate is self-signed; you can safely bypass it.
+
+- **URL:** `https://argocd.local:<HTTPS_NODE_PORT>`
   - **Username:** `admin`
   - **Password:** Retrieve the initial admin password with this command:
     ```bash

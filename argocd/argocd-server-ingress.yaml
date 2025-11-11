@@ -1,0 +1,31 @@
+# This Ingress resource exposes the ArgoCD server using a hostname.
+# It secures the connection using a self-signed TLS certificate.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: argocd-server-ingress
+  namespace: argocd
+  annotations:
+    # This annotation tells the Ingress to communicate with the backend (ArgoCD) using HTTPS.
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+spec:
+  ingressClassName: nginx
+  # TLS configuration that uses a Kubernetes secret containing the certificate and key.
+  tls:
+  - hosts:
+    - argocd.local
+    secretName: argocd-tls
+  rules:
+    # Route traffic for 'argocd.local' to the ArgoCD server.
+  - host: argocd.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            # The ArgoCD server service.
+            name: argocd-server
+            port:
+              # The HTTPS port of the ArgoCD server service.
+              number: 443
