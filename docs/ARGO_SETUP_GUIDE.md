@@ -21,36 +21,48 @@ Run the following commands from a shell with access to your cluster.
   kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
   ```
 
-## 3. Exposing the ArgoCD UI
+## 3. Exposing Services with Ingress
 
-By default, the ArgoCD UI is not exposed externally. To access it via a `NodePort`, patch the `argocd-server` service.
+To expose services like the ArgoCD UI and other applications, we will use an Ingress controller.
 
-- **Patch the Service:**
+- **Install NGINX Ingress Controller:**
   ```bash
-  kubectl patch svc argocd-server -n argocd -p '{"spec":{"type":"NodePort","ports":[{"port":80,"targetPort":8080,"nodePort":30080},{"port":443,"targetPort":8080,"nodePort":30443}]}}'
+  kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.10.1/deploy/static/provider/cloud/deploy.yaml
+  ```
+
+- **Wait for the Controller to be Ready:**
+  ```bash
+  kubectl wait --namespace ingress-nginx --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=120s
   ```
 
 ## 4. Accessing the Environment
 
-- **Get Your Cluster IP:**
-  You will need the IP address of one of your Kubernetes nodes. For local clusters, you can often find this with `minikube ip` or by checking your VM's network configuration.
+- **Get Your Cluster IP and Ingress Port:**
+  You will need the IP address of one of your Kubernetes nodes and the port assigned to the Ingress controller.
+  ```bash
+  # Get the IP
+  kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}'
 
-- **Access the ArgoCD UI:**
-  - **URL:** `http://<YOUR_CLUSTER_IP>:30080`
+  # Get the Port
+  kubectl get svc ingress-nginx-controller --namespace=ingress-nginx -o jsonpath='{.spec.ports[0].nodePort}'
+  ```
+
+- **Accessing Services via Ingress:**
+  To access services like the ArgoCD UI, you must create an `Ingress` resource for them. This typically involves defining a path that maps to the service in the cluster.
+
+  For example, to expose the ArgoCD server, you would create an Ingress that routes a path like `/argocd` to the `argocd-server` service on port 80.
+
+  - **Example URL:** `http://<YOUR_CLUSTER_IP>:<INGRESS_PORT>/<your-path>`
   - **Username:** `admin`
   - **Password:** Retrieve the initial admin password with this command:
     ```bash
     kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d
     ```
 
-## 5. Deploying an Application (Example)
+## 5. Deploying an Application
 
-This project structure is now ready for a GitOps demonstration. To deploy an application:
+This project is now ready for GitOps. To deploy a new application:
 
-1.  Create a new application manifest in the `argocd/` directory (e.g., `guestbook.yaml`).
-2.  Apply the manifest from your shell:
-    ```bash
-    kubectl apply -f argocd/guestbook.yaml
-    ```
-
-ArgoCD will detect the new application and deploy it to the cluster.
+1.  Add your ArgoCD `Application` manifest to the `argocd/` directory.
+2.  If external access is needed, create an `Ingress` resource pointing to your application's service.
+3.  Apply the manifests to your cluster. ArgoCD will then manage the deployment.
